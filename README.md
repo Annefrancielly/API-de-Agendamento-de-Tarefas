@@ -187,5 +187,5 @@ Retorna todas as tarefas cadastradas, ordenadas pela data.
 ## 📩 Contato
 - Desenvolvido por Anne Siqueira
 - LinkedIn: linkedin.com/in/annesiqueiradev
-- E-mail: anne.siqueiradev@gmail.com
+- E-mail: anne.epde05@gmail.com
 
