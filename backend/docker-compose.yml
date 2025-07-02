@@ -2,19 +2,21 @@ version: "3.8"
 
 services:
   api:
-    build:
-      context: .               
-      dockerfile: Dockerfile
-    volumes:
-      - ./data:/app/data       # Só para persistência do SQLite, NÃO sincronize tudo!
+    build: .
+    container_name: jet-task-api-dev
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app           # Permite hot reload
+      - /app/node_modules 
+      - ./data:/app/data 
     env_file:
       - .env
     depends_on:
       - redis
 
   redis:
-    image: redis:7-alpine
+    image: redis:7
+    container_name: jet-task-redis
     ports:
       - "6379:6379"
