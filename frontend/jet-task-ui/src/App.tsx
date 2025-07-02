@@ -1,56 +1,63 @@
-import { useState, useEffect } from 'react';
-import LoginForm from './components/LoginForm';
-import { TaskForm } from './components/TaskForm';
-import { TaskList } from './components/TaskList';
-import { Task } from './types';
-import './index.css'; // importa estilos
-
-import { api } from './services/api';
-
+import { useState, useEffect } from "react";
+import LoginForm from "./components/LoginForm";
+import { TaskForm } from "./components/TaskForm";
+import { TaskList } from "./components/TaskList";
+import { Task } from "./types";
+import "./index.css";
+import { api } from "./services/api";
 
 export default function App() {
-  const [token, setToken] = useState(() => localStorage.getItem('jwt'));
+  const [token, setToken] = useState(() => localStorage.getItem("jwt"));
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Sempre busca tarefas quando logado
   useEffect(() => {
     if (!token) return;
     setLoading(true);
-    api.get<Task[]>('/tasks')
-      .then(res => setTasks(res.data))
+    api
+      .get<Task[]>("/tasks")
+      .then((res) => setTasks(res.data))
       .catch(() => setTasks([]))
       .finally(() => setLoading(false));
   }, [token]);
 
   function handleLogout() {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem("jwt");
     setToken(null);
   }
 
-  // Quando loga, recebe o token, re-renderiza
   if (!token) {
-    return <LoginForm onLoginSuccess={() => setToken(localStorage.getItem('jwt'))} />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-100 to-slate-200">
+        <LoginForm onLoginSuccess={() => setToken(localStorage.getItem("jwt"))} />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center">
-      <header className="w-full py-6 bg-indigo-700 text-white text-center text-3xl font-bold shadow">
-        Jet Task Scheduler
+    <div className="min-h-screen bg-gradient-to-tr from-indigo-100 to-slate-200 dark:from-slate-900 dark:to-indigo-950 transition-colors">
+      <header className="w-full py-6 bg-indigo-700 text-white flex items-center justify-center shadow-lg">
+        <span className="text-2xl font-bold tracking-wide">Agenda de Tarefas</span>
         <button
           onClick={handleLogout}
-          className="ml-8 px-4 py-1 bg-white text-indigo-700 rounded shadow hover:bg-indigo-100"
+          className="ml-8 px-5 py-1 bg-white text-indigo-700 rounded-xl font-semibold shadow hover:bg-indigo-100 transition"
         >
           Logout
         </button>
       </header>
-      <main className="w-full max-w-3xl px-6 py-10">
-      <TaskForm onTaskCreated={(task: Task) => setTasks([task, ...tasks])} />
-        {loading
-          ? <p className="mt-8 text-center text-gray-500">Carregando tarefas…</p>
-          : <TaskList tasks={tasks} />
-        }
+      <main className="w-full max-w-xl mx-auto px-4 py-10">
+        <TaskForm
+          onTaskCreated={(task: Task) => setTasks([task, ...tasks])}
+        />
+        {loading ? (
+          <p className="mt-8 text-center text-indigo-600 animate-pulse">Carregando tarefas…</p>
+        ) : (
+          <TaskList tasks={tasks} />
+        )}
       </main>
+      <footer className="w-full text-center text-xs text-gray-400 py-4">
+        Desenvolvido por Anne • {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }
