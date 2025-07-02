@@ -1,24 +1,27 @@
 import { Request, Response } from 'express';
-import { AppDataSource } from '../data-source';
-import { Task } from '../entity/Task';
+import * as taskService from '../service/tasks.service';
 
-export async function listTasks(_req: Request, res: Response) {
-  const repo = AppDataSource.getRepository(Task);
-  const tasks = await repo.find({ order: { executeAt: 'ASC' } });
-  res.json(tasks);
+// Listar tarefas
+export async function listTasks(req: Request, res: Response) {
+  try {
+    const tasks = await taskService.listTasks();
+    return res.status(200).json(tasks);
+  } catch (err) {
+    console.error('Erro ao listar tarefas:', err);
+    return res.status(500).json({ error: 'Erro ao listar tarefas.' });
+  }
 }
 
+// Criar tarefa
 export async function createTask(req: Request, res: Response) {
-  const { title, description, executeAt, webhookUrl } = req.body;
-  if (!title || !executeAt || !webhookUrl) {
-    return res.status(400).json({ error: 'Campos obrigatórios não informados' });
+  try {
+    const task = await taskService.addTask(req.body);
+    return res.status(201).json(task);
+  } catch (err: any) {
+    if (err.message && err.message.includes('executeAt')) {
+      return res.status(400).json({ error: err.message });
+    }
+    console.error('Erro ao criar tarefa:', err);
+    return res.status(500).json({ error: 'Erro ao criar tarefa.' });
   }
-  if (new Date(executeAt) <= new Date()) {
-    return res.status(400).json({ error: 'Data deve ser futura' });
-  }
-
-  const repo = AppDataSource.getRepository(Task);
-  const task = repo.create({ title, description, executeAt, webhookUrl });
-  await repo.save(task);
-  res.status(201).json(task);
 }
