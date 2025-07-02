@@ -5,6 +5,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import { swaggerOptions } from './config/swagger'; // ajuste o caminho
 import tasksRoutes from './routes/tasks.routes';
 import authRoutes from './routes/auth.routes';
+import "./queue/notificationQueue";
 
 const app = express();
 
