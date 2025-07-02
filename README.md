@@ -84,7 +84,7 @@ docker compose up --build
 API disponível em: http://localhost:3000
 Swagger docs: http://localhost:3000/docs
 </pre>
-###4. (Opcional) Rodar frontend
+### 4. (Opcional) Rodar frontend
 Em outro terminal:
 <pre>
 sh
