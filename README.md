@@ -171,6 +171,169 @@ Retorna todas as tarefas cadastradas, ordenadas pela data.
 
 - Docker Compose: Torna a subida do projeto confiável e fácil em qualquer ambiente.
 
+## 🔧 Solução de Problemas Docker, Node.js, SQLite e Node Modules
+
+### 1. “Meu container não sobe / ‘tsc: not found’ / ‘sqlite3 not found’”
+
+- **Como corrigir:**  
+  Sempre rode o build do container do zero:
+  ```bash
+  docker compose down --volumes
+  docker compose build --no-cache
+  docker compose up
+  ```
+### 2. “sqlite3: invalid ELF header” ou “sqlite3 not installed”
+- Como corrigir:
+
+Nunca copie sua pasta node_modules local para dentro do container.
+
+Certifique-se que seu Dockerfile sempre executa npm install dentro do container.
+
+Se já copiou ou sincronizou node_modules local, apague:
+```
+bash
+Copiar
+Editar
+rm -rf node_modules
+docker compose down --volumes
+docker compose build --no-cache
+docker compose up
+Se der erro ainda:
+```
+Confira se o Dockerfile tem o comando correto:
+```
+Dockerfile
+Copiar
+Editar
+RUN npm install
+Nunca use npm ci se não estiver com o lockfile atualizado.
+```
+### 3. “Cannot connect to the Docker daemon…”
+- Como corrigir:
+
+No Mac/Windows: abra o Docker Desktop.
+
+No Linux:
+```
+bash
+Copiar
+Editar
+sudo systemctl start docker
+
+Teste:
+
+bash
+Copiar
+Editar
+docker info
+```
+Deve exibir as infos do Docker rodando.
+
+### 4. “Error: Cannot find module ‘../queue/notificationQueue’”
+- Como corrigir:
+
+- Confirme a estrutura e os nomes:
+```
+cpp
+Copiar
+Editar
+src/
+  queue/
+    notificationQueue.ts
+```
+- No seu arquivo de entrada:
+```
+ts
+Copiar
+Editar
+import "./queue/notificationQueue";
+```
+- Não coloque .js na importação – apenas o nome relativo.
+
+### 5. “Module ‘bullmq’ has no exported member ‘QueueScheduler’”
+- Como corrigir:
+
+Atualize para a versão mais recente do BullMQ, ou remova o uso do QueueScheduler caso esteja causando erro.
+
+Para rodar local/dev, só Queue e Worker já são suficientes!
+
+### 6. “Task property has no initializer and is not definitely assigned…”
+- Como corrigir:
+
+Adicione o operador ! para dizer ao TypeScript que será inicializado pelo ORM:
+```
+ts
+Copiar
+Editar
+id!: number;
+title!: string;
+Ou defina valores padrão.
+```
+### 7. “Conflitos de branch/git pull/git push no projeto”
+Como corrigir:
+```
+bash
+Copiar
+Editar
+git pull origin main --allow-unrelated-histories
+# ou resolva conflitos manualmente nos arquivos
+# commit e siga normalmente
+```
+### 8. “Redis connection refused” / “ECONNREFUSED 127.0.0.1:6379”
+- Como corrigir:
+
+Confira se o container redis está rodando:
+```
+bash
+Copiar
+Editar
+docker compose ps
+```
+- Rode docker compose up e veja os logs do Redis subindo.
+
+### 9. “Swagger: Could not resolve pointer: /components/schemas/Task does not exist in document”
+- Como corrigir:
+
+Certifique-se que a propriedade schemas está em components dentro de definition no swaggerOptions:
+```
+ts
+Copiar
+Editar
+definition: {
+  // ...
+  components: {
+    schemas: {
+      Task: { /* ... */ }
+    }
+  }
+}
+```
+Nos arquivos de rota, aponte para o schema corretamente com:
+```
+bash
+Copiar
+Editar
+$ref: '#/components/schemas/Task'
+```
+### 💡 DICA DE OURO: Para “resetar tudo” do projeto
+Se nada funcionar e você quiser garantir um ambiente limpo:
+```
+bash
+Copiar
+Editar
+rm -rf node_modules
+rm -rf dist
+rm package-lock.json
+docker compose down --volumes
+docker compose build --no-cache
+docker compose up
+```
+- Nunca copie seu node_modules local para o container.
+
+- Sempre rode docker compose build --no-cache se der erro estranho.
+
+- Leia o log do Docker: ele indica qual container deu problema.
+
 ## 💡 Observações e Melhorias Futuras
 - Prod: Para produção, adotar Postgres/MySQL, segredos seguros e escalabilidade Redis.
 
