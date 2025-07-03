@@ -14,6 +14,7 @@ Bem-vindo a **API de Agendamento de Tarefas** – solução profissional para ag
 - [Testes Manuais de API](#testes-manuais-de-api)
 - [Frontend (UI)](#frontend-ui)
 - [Decisões de Arquitetura](#decisões-de-arquitetura)
+- [ Solução de Problemas Docker, Node.js, SQLite e Node Modules](#solução-de-problemas-docker-node.js-sqlite-e-node-modules)
 - [Observações e Melhorias Futuras](#observações-e-melhorias-futuras)
 - [Contato](#contato)
 
